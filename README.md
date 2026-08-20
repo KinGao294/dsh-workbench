@@ -3,6 +3,15 @@
 一个好看实用的个人工作台插件，运行在 **DSH (DeepSeek Harness) Web GUI** 内。
 设计参考「LIGHT WAVE LAB」暖奶油 × 淡薰衣草配色，开箱即用。
 
+## 🖼 效果预览
+
+> 静态预览页（真实数据渲染，双击打开即可浏览，无需安装）：
+> [`preview-board.html`](./preview-board.html) · [`preview-schedule.html`](./preview-schedule.html) · [`preview-habits.html`](./preview-habits.html)
+
+| 看板首页 | 工作日程模块 | 习惯打卡模块 |
+|---|---|---|
+| ![看板](screenshots/board.png) | ![工作日程](screenshots/schedule.png) | ![习惯打卡](screenshots/habits.png) |
+
 ## ✨ 功能
 
 - **看板首页**：早安横幅（问候语 + 日期 + 每日一句）、KPI 卡片、今日日程、最新 AI 简报、今日习惯、今日完成清单（快速记录）、昨日补记、本月预算、目标进度
