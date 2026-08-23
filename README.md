@@ -6,12 +6,11 @@
 ## 🖼 效果预览
 
 > 静态预览页（真实数据渲染，双击打开即可浏览，无需安装）：
-> [`preview-board.html`](./preview-board.html) · [`preview-budget.html`](./preview-budget.html) · [`preview-goals.html`](./preview-goals.html) · [`preview-schedule.html`](./preview-schedule.html) · [`preview-habits.html`](./preview-habits.html)
+> [`preview-board.html`](./preview-board.html) · [`preview-budget.html`](./preview-budget.html) · [`preview-schedule.html`](./preview-schedule.html)
 
 | 看板首页 | 工作日程模块 | 习惯打卡模块 |
 |---|---|---|
-| ![看板](screenshots/board.png) | ![开销记账](screenshots/budget.png) | ![目标管理](screenshots/goals.png) |
-| ![工作日程](screenshots/schedule.png) | ![习惯打卡](screenshots/habits.png) | |
+| ![看板](screenshots/board.png) | ![开销记账](screenshots/budget.png) | ![工作日程](screenshots/schedule.png) |
 
 ## ✨ 功能
 
