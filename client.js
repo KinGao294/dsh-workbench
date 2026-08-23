@@ -433,7 +433,7 @@ return {
           h(DelBtn, { onClick: () => p.delYesterday(t.id) }))) : h('div', { className: 'wb-empty' }, '补记昨天完成的事，回车记录 ✍️')),
         h(InputRow, { placeholder: '补记昨天完成的事，回车记录', value: p.yInput, onChange: p.setYInput, onAdd: p.addYesterday, addText: '补记' }))
 
-      const catAgg = {}
+      const catAgg = {};
       (p.data.expenses || []).filter((e) => (e.date || '').indexOf(dateKey(now).slice(0, 7)) === 0).forEach((e) => { catAgg[e.cat] = (catAgg[e.cat] || 0) + (Number(e.amount) || 0) })
       const topCats = Object.keys(catAgg).sort((a, b) => catAgg[b] - catAgg[a]).slice(0, 3)
       const budgetPanel = h(Panel, { title: '💳 本月支出', action: { text: '明细 →', onClick: () => p.setPage('budget') } },
