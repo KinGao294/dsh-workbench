@@ -1,22 +1,3 @@
-/**
- * LIGHT WAVE LAB 个人工作台 — Client 半边（浏览器 UI）
- *
- * 用法：在 DSH Web GUI 中通过动态插件（cordis_define）定义本文件内容为
- * code.client；或作为标准 Cordis 插件的 client 入口。
- *
- * 界面（对照 LIGHT WAVE LAB 参考设计）：
- *   左侧 12 模块导航：看板 / 热点简报 / 工作日程 / 开销记账 / 选题库 /
- *   读书管理 / 习惯打卡 / 目标管理 / 自动复盘 / 任务中心 / 完成清单 / 设置
- *   看板页：早安横幅 + KPI 卡片 + 今日日程 + 最新 AI 简报 + 今日习惯 +
- *           今日完成清单 + 昨日补记 + 本月预算 + 目标进度
- *   独立页：工作日程 / 习惯打卡 / 开销记账 / 目标管理 / 完成清单 / 热点简报
- *
- * 入口：右下角悬浮按钮（避开 dsh-pet 小奶龙）+ 侧边栏底部 + 会话头部。
- * 数据：经 host.call('wb:load' / 'wb:save') 与 Host 半边通信，持久化到
- *       {workspace}/.dsh-workbench.json。
- *
- * 注意：本文件是「复制即用」形态，直接返回 Cordis 插件对象；无需构建。
- */
 return {
   apply(ctx) {
     const slots = ctx.get('slots')
@@ -106,10 +87,6 @@ return {
 .wb-page-head-icon{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#eee9fa,#e2dcf5);display:flex;align-items:center;justify-content:center;font-size:18px;}
 .wb-page-head-title{font-size:19px;font-weight:800;color:#38315c;}
 .wb-page-head-sub{font-size:12px;color:#8a83a8;margin-top:2px;}
-.wb-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:90px 20px;gap:10px;background:#fffdf8;border:1px dashed #ddd5ee;border-radius:18px;}
-.wb-placeholder-icon{font-size:40px;}
-.wb-placeholder-title{font-size:16px;font-weight:800;color:#3c3560;}
-.wb-placeholder-sub{font-size:12.5px;color:#8a83a8;}
 .wb-loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#f5f0e8;color:#8a83a8;font-size:14px;}
 .wb-open-btn{display:flex;align-items:center;gap:8px;border:none;background:linear-gradient(135deg,#a99fe2,#8f86d8);color:#fff;font-size:13px;font-weight:600;cursor:pointer;padding:7px 12px;border-radius:9px;font-family:inherit;transition:opacity .15s;margin:2px;box-shadow:0 2px 8px rgba(143,134,216,.25);}
 .wb-open-btn:hover{opacity:.88;}
@@ -119,13 +96,30 @@ return {
 .wb-fab{position:fixed;right:18px;bottom:210px;z-index:2147483100;display:flex;align-items:center;gap:8px;border:none;background:linear-gradient(135deg,#a99fe2,#8f86d8);color:#fff;font-size:14px;font-weight:700;cursor:pointer;padding:12px 18px;border-radius:999px;font-family:inherit;box-shadow:0 6px 20px rgba(143,134,216,.45);transition:opacity .15s,transform .15s;pointer-events:auto;}
 .wb-fab:hover{opacity:.9;transform:translateY(-1px);}
 .wb-fab-icon{font-size:17px;}
+.wb-chip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:20px;flex-shrink:0;cursor:pointer;border:none;font-family:inherit;transition:opacity .15s;}
+.wb-chip:hover{opacity:.85;}
+.wb-chip-lavender{background:#eee9fa;color:#8f86d8;}
+.wb-chip-green{background:#e3f3ea;color:#4a9a6e;}
+.wb-chip-amber{background:#fdf0dd;color:#c98a2d;}
+.wb-chip-blue{background:#e4effb;color:#4a86c4;}
+.wb-chip-gray{background:#efeaf1;color:#8a83a8;}
+.wb-review-card{background:#f8f5f0;border:1px solid #f0eae0;border-radius:12px;padding:12px 14px;}
+.wb-review-date{font-size:11px;font-weight:700;color:#8f86d8;margin-bottom:6px;}
+.wb-review-text{font-size:12.5px;color:#4a4460;line-height:1.7;white-space:pre-wrap;}
+.wb-theme-swatch{width:34px;height:34px;border-radius:10px;border:2px solid transparent;cursor:pointer;transition:border-color .15s,transform .15s;}
+.wb-theme-swatch:hover{transform:scale(1.08);}
+.wb-theme-swatch.active{border-color:#3c3560;}
+.wb-setting-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0eae0;}
+.wb-setting-row:last-child{border-bottom:none;}
+.wb-setting-label{flex:1;font-size:13px;color:#4a4460;min-width:0;}
+.wb-danger-btn{border:none;background:#fbeef0;color:#e2888f;font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:10px;cursor:pointer;font-family:inherit;transition:opacity .15s;}
+.wb-danger-btn:hover{opacity:.85;}
 .wb-main::-webkit-scrollbar,.wb-sidebar::-webkit-scrollbar{width:8px;}
 .wb-main::-webkit-scrollbar-thumb,.wb-sidebar::-webkit-scrollbar-thumb{background:#d9d2ea;border-radius:4px;}
 @media (max-width:900px){.wb-sidebar{width:64px;padding:16px 8px;}.wb-nav-item span:last-child,.wb-logo>div:last-child,.wb-sidebar-foot .wb-nav-item span:last-child{display:none;}.wb-main{padding:18px 14px 30px;}}
 `
     styles.insert(CSS)
 
-    // ------- 打开状态（模块级，跨 Slot 共享） -------
     const listeners = new Set()
     let open = false
     function setOpen(v) { open = v; listeners.forEach((f) => f(v)) }
@@ -135,12 +129,18 @@ return {
       return s
     }
 
-    // ------- 工具 -------
     const pad = (n) => String(n).padStart(2, '0')
     function dateKey(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) }
     const WEEK = ['日', '一', '二', '三', '四', '五', '六']
     function greeting() { const hh = new Date().getHours(); return hh < 6 ? '夜深了 🌙' : hh < 12 ? '早上好 👋' : hh < 18 ? '下午好 ☀️' : '晚上好 🌙' }
     const uid = () => Math.random().toString(36).slice(2, 9)
+    const THEMES = {
+      lavender: { accent: '#8f86d8', accent2: '#b9b0ea', dark: '#5b4fae' },
+      mint: { accent: '#5fae8c', accent2: '#a8dcc4', dark: '#3e8f72' },
+      peach: { accent: '#e3916f', accent2: '#f2c0a8', dark: '#c96f4e' },
+      ocean: { accent: '#5b93c9', accent2: '#a5c8e8', dark: '#3b76ad' }
+    }
+    const THEME_LABELS = { lavender: '薰衣草', mint: '薄荷', peach: '蜜桃', ocean: '海洋' }
 
     function defaults() {
       const now = new Date()
@@ -153,27 +153,43 @@ return {
           { id: 'h1', icon: '💧', name: '每天1.5L水', done: false },
           { id: 'h2', icon: '💤', name: '晚上12:30前睡觉', done: false },
           { id: 'h3', icon: '✍️', name: 'DONE LIST', done: false },
-          { id: 'h4', icon: '🧗', name: '每周攀岩至少2次', done: false },
+          { id: 'h4', icon: '🧗', name: '每周攀岩至少2次', done: false }
         ],
         schedule: [{ id: 's1', time: '09:30', text: '拍摄视频并剪辑', done: false }],
         briefings: [
           { id: 'b1', title: 'OpenRouter 并入 Stripe：AI 路由巨头为何选支付公司当靠山？', tag: '选题雷达' },
           { id: 'b2', title: '宇树上市首日造富 40 亿，王兴兴首谈「大脑」技术路线', tag: '选题雷达' },
           { id: 'b3', title: 'OpenAI 推出前沿模型零数据留存，企业客户终于能放心用 API？', tag: '选题雷达' },
-          { id: 'b4', title: '为前沿模型提供零数据留存 / Zero-Data...', tag: '选题雷达' },
+          { id: 'b4', title: '为前沿模型提供零数据留存 / Zero-Data...', tag: '选题雷达' }
         ],
         budget: { total: 8000, spent: 3200 },
         goals: [
           { id: 'g1', title: '季度 OKR：内容矩阵 12 篇', progress: 40 },
-          { id: 'g2', title: '读完《爱的博弈》', progress: 60 },
+          { id: 'g2', title: '读完《爱的博弈》', progress: 60 }
         ],
         books: { reading: 2, finished: 2 },
         streak: 1,
         quote: '“信任的建立，在于你是否愿意在对方需要时，放下自己的防御去回应他。” —《爱的博弈：建立信任、避免背叛与不忠》',
+        topics: [
+          { id: 'tp1', title: 'AI 编程助手赛道观察：从 Copilot 到 Agent', tag: 'AI', status: '待写' },
+          { id: 'tp2', title: '大模型私有化部署的成本账', tag: 'AI', status: '写作中' },
+          { id: 'tp3', title: '内容创作者的工具链 2026', tag: '创作', status: '已发布' }
+        ],
+        bookList: [
+          { id: 'bk1', title: '爱的博弈', author: '约翰·戈特曼', status: 'reading', progress: 60 },
+          { id: 'bk2', title: '思考，快与慢', author: '丹尼尔·卡尼曼', status: 'finished', progress: 100 },
+          { id: 'bk3', title: '纳瓦尔宝典', author: '埃里克·乔根森', status: 'wish', progress: 0 }
+        ],
+        reviews: [],
+        centerTasks: [
+          { id: 'ct1', title: '整理本周工作重点', priority: '高', done: false },
+          { id: 'ct2', title: '给工作台写开源 README', priority: '中', done: false },
+          { id: 'ct3', title: '预约下周例会', priority: '低', done: false }
+        ],
+        settings: { userName: '我的', theme: 'lavender' }
       }
     }
 
-    // 数据兜底：任何输入都补全默认字段，防止渲染崩溃
     function normalize(d) {
       const base = defaults()
       const now = new Date()
@@ -198,6 +214,12 @@ return {
       if (!out.books || typeof out.books.reading !== 'number') out.books = base.books
       if (typeof out.streak !== 'number') out.streak = base.streak
       if (!out.quote) out.quote = base.quote
+      if (!Array.isArray(out.topics)) out.topics = base.topics
+      if (!Array.isArray(out.bookList)) out.bookList = base.bookList
+      if (!Array.isArray(out.reviews)) out.reviews = []
+      if (!Array.isArray(out.centerTasks)) out.centerTasks = base.centerTasks
+      if (!out.settings || typeof out.settings !== 'object') out.settings = base.settings
+      if (!out.settings.theme || !THEMES[out.settings.theme]) out.settings.theme = 'lavender'
       return out
     }
 
@@ -213,10 +235,9 @@ return {
       { id: 'review', icon: '🔁', label: '自动复盘' },
       { id: 'center', icon: '✅', label: '任务中心' },
       { id: 'tasks', icon: '✍️', label: '完成清单' },
-      { id: 'settings', icon: '⚙️', label: '设置' },
+      { id: 'settings', icon: '⚙️', label: '设置' }
     ]
 
-    // ------- 原子组件 -------
     function Check(props) {
       return h('button', { className: 'wb-check' + (props.done ? ' on' : ''), onClick: props.onClick, title: props.done ? '标记未完成' : '标记完成' }, props.done ? '✓' : '')
     }
@@ -232,6 +253,9 @@ return {
         h('input', { className: 'wb-input', placeholder: props.placeholder, value: props.value, onChange: (e) => { if (props.onChange) props.onChange(e.target.value) }, onKeyDown: (e) => { if (e.key === 'Enter') props.onAdd() } }),
         h('button', { className: 'wb-add-btn', onClick: props.onAdd }, props.addText || '记录'))
     }
+    function Chip(props) {
+      return h('button', { className: 'wb-chip wb-chip-' + (props.color || 'gray'), onClick: props.onClick, title: props.title || '' }, props.children)
+    }
     function KpiCard(props) {
       const bar = props.bar ? h('div', { className: 'wb-kpi-bar' },
         h('div', { className: 'wb-kpi-bar-track' }, h('div', { className: 'wb-kpi-bar-fill', style: { width: Math.min(100, props.bar.pct) + '%' } })),
@@ -242,24 +266,31 @@ return {
         h('div', { className: 'wb-kpi-value' }, String(props.value), h('span', { className: 'wb-kpi-unit' }, ' ' + props.unit)),
         h('div', { className: 'wb-kpi-label' }, props.label), sub, bar)
     }
+    function PageHead(props) {
+      return h('div', { className: 'wb-panel' },
+        h('div', { className: 'wb-page-head' },
+          h('div', { className: 'wb-page-head-icon' }, props.icon),
+          h('div', null,
+            h('div', { className: 'wb-page-head-title' }, props.title),
+            h('div', { className: 'wb-page-head-sub' }, props.sub || ''))),
+        props.children)
+    }
 
-    // ------- 侧边栏 -------
     function Sidebar(p) {
       return h('div', { className: 'wb-sidebar' },
         h('div', { className: 'wb-logo' },
           h('div', { className: 'wb-logo-icon' }, '💼'),
-          h('div', null, h('div', { className: 'wb-logo-name' }, '我的工作台'), h('div', { className: 'wb-logo-sub' }, 'LIGHT WAVE LAB'))),
+          h('div', null, h('div', { className: 'wb-logo-name' }, p.userName + '工作台'), h('div', { className: 'wb-logo-sub' }, 'LIGHT WAVE LAB'))),
         h('div', { className: 'wb-nav' }, NAV.map((n) => h('button', {
           key: n.id,
           className: 'wb-nav-item' + (p.page === n.id ? ' active' : ''),
-          onClick: () => p.setPage(n.id),
+          onClick: () => p.setPage(n.id)
         }, h('span', { className: 'wb-nav-icon' }, n.icon), h('span', null, n.label)))),
         h('div', { className: 'wb-sidebar-foot' },
           h('button', { className: 'wb-nav-item', onClick: p.onClose },
             h('span', { className: 'wb-nav-icon' }, '🚪'), h('span', null, '关闭工作台'))))
     }
 
-    // ------- 看板页 -------
     function BoardPage(p) {
       const now = new Date()
       const dateLine = now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日 星期' + WEEK[now.getDay()] + ' · LIGHT WAVE LAB'
@@ -271,21 +302,24 @@ return {
         h('button', { className: 'wb-close-btn', onClick: p.onClose, title: '关闭工作台' }, '✕'))
 
       const budgetPct = p.data.budget.total > 0 ? Math.round((p.data.budget.spent / p.data.budget.total) * 100) : 0
+      const readingN = (p.data.bookList || []).filter((b) => b.status === 'reading').length
+      const finishedN = (p.data.bookList || []).filter((b) => b.status === 'finished').length
+      const todoN = (p.data.centerTasks || []).filter((t) => !t.done).length
       const kpis = [
         { icon: '✅', value: p.doneToday, unit: '条记录', label: '今日完成' },
         { icon: '🔥', value: p.data.streak || 0, unit: '天', label: '最长连续打卡', sub: '习惯坚持' },
-        { icon: '📚', value: p.data.books.reading, unit: '本', label: '在读', sub: '共读完 ' + p.data.books.finished + ' 本' },
+        { icon: '📚', value: readingN, unit: '本', label: '在读', sub: '共读完 ' + finishedN + ' 本' },
         { icon: '🏆', value: p.activeGoals, unit: '个', label: '进行中目标', sub: 'OKR' },
         { icon: '📰', value: (p.data.briefings || []).length, unit: '篇', label: '本周简报', sub: 'AI 热点' },
+        { icon: '📌', value: todoN, unit: '项', label: '待办任务', sub: '任务中心' }
       ]
       const kpiGrid = h('div', { className: 'wb-kpi-grid' }, kpis.map((k, i) => h(KpiCard, Object.assign({ key: i }, k))))
 
       const schedPanel = h(Panel, { title: '🗓 今日日程', action: { text: '管理日程 →', onClick: () => p.setPage('schedule') } },
-        h('div', { className: 'wb-list' }, (p.data.schedule || []).map((s) => h('div', { key: s.id, className: 'wb-sched-row' + (s.done ? ' done' : '') },
+        h('div', { className: 'wb-list' }, (p.data.schedule || []).slice(0, 4).map((s) => h('div', { key: s.id, className: 'wb-sched-row' + (s.done ? ' done' : '') },
           h('div', { className: 'wb-sched-time' }, s.time || ''),
           h('div', { className: 'wb-sched-text' }, s.text),
-          h(Check, { done: s.done, onClick: () => p.toggle('schedule', s.id) }),
-          h(DelBtn, { onClick: () => p.del('schedule', s.id) })))))
+          h(Check, { done: s.done, onClick: () => p.toggle('schedule', s.id) })))))
 
       const briefPanel = h(Panel, { title: '📰 最新 AI 简报', action: { text: '去热点简报 →', onClick: () => p.setPage('brief') } },
         h('div', { className: 'wb-list' }, (p.data.briefings || []).slice(0, 4).map((b, i) => h('div', { key: b.id, className: 'wb-brief-row' },
@@ -298,8 +332,7 @@ return {
         h('div', { className: 'wb-list' }, (p.data.habits || []).map((x) => h('div', { key: x.id, className: 'wb-habit-row' + (x.done ? ' done' : '') },
           h('span', { className: 'wb-habit-icon' }, x.icon || '⭐'),
           h('span', { className: 'wb-habit-name' }, x.name),
-          h(Check, { done: x.done, onClick: () => p.toggle('habits', x.id) }),
-          h(DelBtn, { onClick: () => p.del('habits', x.id) })))))
+          h(Check, { done: x.done, onClick: () => p.toggle('habits', x.id) })))))
 
       const row3 = h('div', { className: 'wb-row3' }, schedPanel, briefPanel, habitPanel)
 
@@ -335,18 +368,6 @@ return {
       return h('div', { className: 'wb-page' }, hero, kpiGrid, row3, grid2)
     }
 
-    // ------- 页头 -------
-    function PageHead(props) {
-      return h('div', { className: 'wb-panel' },
-        h('div', { className: 'wb-page-head' },
-          h('div', { className: 'wb-page-head-icon' }, props.icon),
-          h('div', null,
-            h('div', { className: 'wb-page-head-title' }, props.title),
-            h('div', { className: 'wb-page-head-sub' }, props.sub || ''))),
-        props.children)
-    }
-
-    // ------- 工作日程页 -------
     function SchedulePage(p) {
       const [text, setText] = React.useState('')
       const [time, setTime] = React.useState('')
@@ -368,7 +389,6 @@ return {
             h('button', { className: 'wb-add-btn', onClick: add }, '添加'))))
     }
 
-    // ------- 习惯打卡页 -------
     function HabitsPage(p) {
       const [name, setName] = React.useState('')
       function add() {
@@ -387,7 +407,6 @@ return {
           h(InputRow, { placeholder: '新增习惯，如：每天读书 30 分钟', value: name, onChange: setName, onAdd: add, addText: '添加' })))
     }
 
-    // ------- 开销记账页 -------
     function BudgetPage(p) {
       const b = p.data.budget
       const pct = b.total > 0 ? Math.round((b.spent / b.total) * 100) : 0
@@ -414,7 +433,6 @@ return {
                 '· 输入数字即时更新预算进度\n· 可支配余额 = 总额 − 已支出\n· 建议每月初重置预算额度')))))
     }
 
-    // ------- 目标管理页 -------
     function GoalsPage(p) {
       const [title, setTitle] = React.useState('')
       function add() {
@@ -434,7 +452,6 @@ return {
           h(InputRow, { placeholder: '新增目标，如：读完 12 本书', value: title, onChange: setTitle, onAdd: add, addText: '添加' })))
     }
 
-    // ------- 完成清单页 -------
     function TasksPage(p) {
       const [input, setInput] = React.useState('')
       const [yInput, setYInput] = React.useState('')
@@ -468,7 +485,6 @@ return {
               h(InputRow, { placeholder: '补记昨天的完成，回车记录', value: yInput, onChange: setYInput, onAdd: addYesterday, addText: '补记' })))))
     }
 
-    // ------- 热点简报页 -------
     function BriefingsPage(p) {
       const [input, setInput] = React.useState('')
       function add() {
@@ -486,17 +502,175 @@ return {
           h(InputRow, { placeholder: '手动收录一条热点', value: input, onChange: setInput, onAdd: add, addText: '收录' })))
     }
 
-    // ------- 占位页 -------
-    function Placeholder(props) {
-      const nav = NAV.find((n) => n.id === props.id) || {}
+    function TopicsPage(p) {
+      const [title, setTitle] = React.useState('')
+      const [tag, setTag] = React.useState('')
+      function add() {
+        if (!title.trim()) return
+        p.update((d) => { d.topics.unshift({ id: uid(), title: title.trim(), tag: tag.trim() || '选题', status: '待写' }) })
+        setTitle('')
+      }
+      const statusColor = { '待写': 'amber', '写作中': 'blue', '已发布': 'green' }
+      const statusNext = { '待写': '写作中', '写作中': '已发布', '已发布': '待写' }
+      const list = (p.data.topics || []).map((t) => h('div', { key: t.id, className: 'wb-task-row' },
+        h('span', { className: 'wb-task-text', style: { flex: 1 } }, t.title),
+        h(Chip, { color: 'gray' }, t.tag || '选题'),
+        h(Chip, { color: statusColor[t.status] || 'gray', onClick: () => p.update((d) => { const x = d.topics.find((y) => y.id === t.id); if (x) x.status = statusNext[x.status] || '待写' }), title: '点击切换状态' }, t.status + ' ↻'),
+        h(DelBtn, { onClick: () => p.update((d) => { d.topics = d.topics.filter((y) => y.id !== t.id) }) })))
       return h('div', { className: 'wb-page' },
-        h('div', { className: 'wb-placeholder' },
-          h('div', { className: 'wb-placeholder-icon' }, nav.icon || '🚧'),
-          h('div', { className: 'wb-placeholder-title' }, (nav.label || '') + ' · 建设中'),
-          h('div', { className: 'wb-placeholder-sub' }, '该模块正在打磨，敬请期待')))
+        h(PageHead, { icon: '🎯', title: '选题库', sub: '选题状态流转：待写 → 写作中 → 已发布（点状态标签切换）' },
+          h('div', { className: 'wb-list', style: { marginTop: 14 } }, list),
+          h('div', { className: 'wb-input-row', style: { marginTop: 14 } },
+            h('input', { className: 'wb-input', placeholder: '选题标题', value: title, onChange: (e) => setTitle(e.target.value), onKeyDown: (e) => { if (e.key === 'Enter') add() } }),
+            h('input', { className: 'wb-input', placeholder: '标签，如 AI', value: tag, onChange: (e) => setTag(e.target.value), style: { maxWidth: 120 } }),
+            h('button', { className: 'wb-add-btn', onClick: add }, '添加'))))
     }
 
-    // ------- 工作台主体 -------
+    function BooksPage(p) {
+      const [title, setTitle] = React.useState('')
+      const [author, setAuthor] = React.useState('')
+      function add() {
+        if (!title.trim()) return
+        p.update((d) => { d.bookList.unshift({ id: uid(), title: title.trim(), author: author.trim() || '未知', status: 'wish', progress: 0 }) })
+        setTitle('')
+      }
+      const statusColor = { reading: 'blue', finished: 'green', wish: 'amber' }
+      const statusLabel = { reading: '在读', finished: '读完', wish: '想读' }
+      const statusNext = { reading: 'finished', finished: 'wish', wish: 'reading' }
+      const list = (p.data.bookList || []).map((b) => h('div', { key: b.id, className: 'wb-goal-row' },
+        h('div', { className: 'wb-goal-top' },
+          h('span', { className: 'wb-goal-title' }, b.title + (b.author ? ' · ' + b.author : '')),
+          h(Chip, { color: statusColor[b.status] || 'gray', onClick: () => p.update((d) => { const x = d.bookList.find((y) => y.id === b.id); if (x) x.status = statusNext[x.status] || 'reading' }), title: '点击切换状态' }, statusLabel[b.status] + ' ↻'),
+          h('span', { className: 'wb-goal-pct' }, (b.progress || 0) + '%'),
+          h(DelBtn, { onClick: () => p.update((d) => { d.bookList = d.bookList.filter((y) => y.id !== b.id) }) })),
+        h('div', { className: 'wb-range-wrap' },
+          h('input', { className: 'wb-range', type: 'range', min: 0, max: 100, step: 5, value: b.progress || 0, onChange: (e) => p.update((d) => { const x = d.bookList.find((y) => y.id === b.id); if (x) x.progress = Number(e.target.value) }) }))))
+      return h('div', { className: 'wb-page' },
+        h(PageHead, { icon: '📚', title: '读书管理', sub: '管理在读 / 想读 / 已读完的书籍（点状态标签切换）' },
+          h('div', { className: 'wb-list', style: { marginTop: 14 } }, list),
+          h('div', { className: 'wb-input-row', style: { marginTop: 14 } },
+            h('input', { className: 'wb-input', placeholder: '书名', value: title, onChange: (e) => setTitle(e.target.value), onKeyDown: (e) => { if (e.key === 'Enter') add() } }),
+            h('input', { className: 'wb-input', placeholder: '作者', value: author, onChange: (e) => setAuthor(e.target.value), style: { maxWidth: 160 } }),
+            h('button', { className: 'wb-add-btn', onClick: add }, '添加'))))
+    }
+
+    function ReviewPage(p) {
+      const todayKey = p.todayKey
+      const doneToday = (p.data.tasks[todayKey] || []).filter((t) => t.done)
+      const habitDone = (p.data.habits || []).filter((x) => x.done).length
+      const habitTotal = (p.data.habits || []).length
+      const schedDone = (p.data.schedule || []).filter((s) => s.done).length
+      const schedTotal = (p.data.schedule || []).length
+      const taskLeft = (p.data.centerTasks || []).filter((t) => !t.done)
+      function generate() {
+        const lines = []
+        lines.push('【今日完成】' + (doneToday.length ? doneToday.map((t) => t.text).join('、') : '无'))
+        lines.push('【习惯打卡】' + habitDone + '/' + habitTotal + ' 项完成')
+        lines.push('【日程】' + schedDone + '/' + schedTotal + ' 项已完成')
+        lines.push('【待办任务】剩余 ' + taskLeft.length + ' 项' + (taskLeft.length ? '：' + taskLeft.map((t) => t.title).join('、') : ''))
+        lines.push('【小结】' + (doneToday.length >= 3 ? '今天产出不错，继续保持节奏 💪' : '今天记录偏少，明天从一件小事开始 🌱'))
+        const text = lines.join('\n')
+        p.update((d) => { d.reviews.unshift({ id: uid(), date: p.dateLine, text }) })
+      }
+      const stats = [
+        ['✅', '今日完成 ' + doneToday.length + ' 项', doneToday.length ? 'green' : 'gray', doneToday.length ? '有产出' : '暂无'],
+        ['🌱', '习惯 ' + habitDone + '/' + habitTotal, habitDone ? 'green' : 'gray', habitDone ? '已打卡' : '未打卡'],
+        ['🗓', '日程完成 ' + schedDone + '/' + schedTotal, schedDone ? 'green' : 'gray', schedDone ? '进行中' : '待安排'],
+        ['📌', '剩余待办 ' + taskLeft.length + ' 项', taskLeft.length ? 'amber' : 'green', taskLeft.length ? '待处理' : '已清空']
+      ]
+      const statRows = stats.map((s, i) => h('div', { key: i, className: 'wb-habit-row' },
+        h('span', { className: 'wb-habit-icon' }, s[0]),
+        h('span', { className: 'wb-habit-name' }, s[1]),
+        h(Chip, { color: s[2] }, s[3])))
+      const reviewList = (p.data.reviews || []).map((r) => h('div', { key: r.id, className: 'wb-review-card' },
+        h('div', { className: 'wb-review-date' }, r.date),
+        h('div', { className: 'wb-review-text' }, r.text),
+        h('div', { style: { textAlign: 'right', marginTop: 6 } }, h(DelBtn, { onClick: () => p.update((d) => { d.reviews = d.reviews.filter((x) => x.id !== r.id) }) }))))
+      return h('div', { className: 'wb-page' },
+        h(PageHead, { icon: '🔁', title: '自动复盘', sub: '基于今日完成 / 习惯 / 日程 / 待办 一键生成复盘' },
+          h('div', { className: 'wb-panel', style: { marginTop: 14 } },
+            h('div', { className: 'wb-panel-head' },
+              h('div', { className: 'wb-panel-title' }, '今日数据快照'),
+              h('button', { className: 'wb-add-btn', onClick: generate }, '⚡ 一键生成复盘')),
+            h('div', { className: 'wb-list' }, statRows)),
+          h('div', { className: 'wb-panel', style: { marginTop: 14 } },
+            h('div', { className: 'wb-panel-head' }, h('div', { className: 'wb-panel-title' }, '历史复盘'), null),
+            reviewList.length ? h('div', { className: 'wb-list' }, reviewList) : h('div', { className: 'wb-empty' }, '还没有复盘记录，点「一键生成复盘」试试'))))
+    }
+
+    function CenterPage(p) {
+      const [title, setTitle] = React.useState('')
+      const [pri, setPri] = React.useState('中')
+      function add() {
+        if (!title.trim()) return
+        p.update((d) => { d.centerTasks.unshift({ id: uid(), title: title.trim(), priority: pri, done: false }) })
+        setTitle('')
+      }
+      const priColor = { '高': 'amber', '中': 'blue', '低': 'gray' }
+      const priOrder = { '高': 0, '中': 1, '低': 2 }
+      const sorted = (p.data.centerTasks || []).slice().sort((a, b) => (priOrder[a.priority] != null ? priOrder[a.priority] : 1) - (priOrder[b.priority] != null ? priOrder[b.priority] : 1))
+      const doneCount = (p.data.centerTasks || []).filter((t) => t.done).length
+      const list = sorted.map((t) => h('div', { key: t.id, className: 'wb-task-row' + (t.done ? ' done' : '') },
+        h(Check, { done: t.done, onClick: () => p.update((d) => { const x = d.centerTasks.find((y) => y.id === t.id); if (x) x.done = !x.done }) }),
+        h('span', { className: 'wb-task-text' }, t.title),
+        h(Chip, { color: priColor[t.priority] || 'gray', onClick: () => p.update((d) => { const x = d.centerTasks.find((y) => y.id === t.id); if (x) x.priority = x.priority === '高' ? '中' : x.priority === '中' ? '低' : '高' }), title: '点击切换优先级' }, t.priority + ' ↻'),
+        h(DelBtn, { onClick: () => p.update((d) => { d.centerTasks = d.centerTasks.filter((y) => y.id !== t.id) }) })))
+      return h('div', { className: 'wb-page' },
+        h(PageHead, { icon: '✅', title: '任务中心', sub: '已完成 ' + doneCount + ' / ' + (p.data.centerTasks || []).length + ' 项 · 按优先级排序（点优先级切换）' },
+          h('div', { className: 'wb-list', style: { marginTop: 14 } }, list),
+          h('div', { className: 'wb-input-row', style: { marginTop: 14 } },
+            h('input', { className: 'wb-input', placeholder: '新任务', value: title, onChange: (e) => setTitle(e.target.value), onKeyDown: (e) => { if (e.key === 'Enter') add() } }),
+            h('select', { className: 'wb-input', value: pri, onChange: (e) => setPri(e.target.value), style: { maxWidth: 110 } },
+              h('option', { value: '高' }, '高优先级'),
+              h('option', { value: '中' }, '中优先级'),
+              h('option', { value: '低' }, '低优先级')),
+            h('button', { className: 'wb-add-btn', onClick: add }, '添加'))))
+    }
+
+    function SettingsPage(p) {
+      const curName = (p.data.settings && p.data.settings.userName) || '我的'
+      const [userName, setUserName] = React.useState(curName)
+      const [msg, setMsg] = React.useState('')
+      function saveName() {
+        p.update((d) => { if (!d.settings) d.settings = {}; d.settings.userName = userName.trim() || '我的' })
+        setMsg('已保存')
+      }
+      function doExport() {
+        host.call('wb:export').then((r) => { setMsg(r && r.ok ? '已导出到 ' + (r.path || '工作区') : '导出失败') }).catch(() => setMsg('导出失败'))
+      }
+      function doReset() {
+        host.call('wb:reset').then(() => { setMsg('已重置为默认数据'); p.update(() => {}) }).catch(() => setMsg('重置失败'))
+      }
+      const themeNames = Object.keys(THEMES)
+      const swatches = themeNames.map((t) => {
+        const th = THEMES[t]
+        const cur = p.data.settings && p.data.settings.theme === t
+        return h('div', { key: t, style: { textAlign: 'center' } },
+          h('div', { className: 'wb-theme-swatch' + (cur ? ' active' : ''), style: { background: 'linear-gradient(135deg,' + th.accent2 + ',' + th.accent + ')' }, onClick: () => p.update((d) => { if (!d.settings) d.settings = {}; d.settings.theme = t }) }),
+          h('div', { style: { fontSize: 11, color: '#8a83a8', marginTop: 4 } }, THEME_LABELS[t] || t))
+      })
+      return h('div', { className: 'wb-page' },
+        h(PageHead, { icon: '⚙️', title: '设置', sub: '个性化你的工作台' },
+          h('div', { className: 'wb-panel', style: { marginTop: 14 } },
+            h('div', { className: 'wb-panel-title' }, '工作台名称'),
+            h('div', { className: 'wb-input-row' },
+              h('input', { className: 'wb-input', value: userName, onChange: (e) => setUserName(e.target.value), placeholder: '如：我的 / 小明的' }),
+              h('button', { className: 'wb-add-btn', onClick: saveName }, '保存')),
+            h('div', { style: { fontSize: 11, color: '#a099b8', marginTop: 6 } }, msg)),
+          h('div', { className: 'wb-panel', style: { marginTop: 14 } },
+            h('div', { className: 'wb-panel-title' }, '主题配色'),
+            h('div', { className: 'wb-list', style: { flexDirection: 'row', marginTop: 10, gap: 12 } }, swatches)),
+          h('div', { className: 'wb-panel', style: { marginTop: 14 } },
+            h('div', { className: 'wb-panel-title' }, '数据管理'),
+            h('div', { className: 'wb-setting-row' },
+              h('div', { className: 'wb-setting-label' }, '导出全部数据到工作区 JSON 文件'),
+              h('button', { className: 'wb-add-btn', onClick: doExport }, '导出')),
+            h('div', { className: 'wb-setting-row' },
+              h('div', { className: 'wb-setting-label' }, '重置为默认数据（清空所有记录）'),
+              h('button', { className: 'wb-danger-btn', onClick: doReset }, '重置')),
+            h('div', { style: { fontSize: 11, color: '#a099b8', marginTop: 6 } }, msg))))
+    }
+
     function Workbench(props) {
       const [data, setData] = React.useState(null)
       const [page, setPage] = React.useState('board')
@@ -519,13 +693,16 @@ return {
       }
       if (!data) return h('div', { className: 'wb-loading' }, '工作台加载中…')
 
-      const todayKey = dateKey(new Date())
+      const now = new Date()
+      const todayKey = dateKey(now)
       const yesterdayKey = dateKey(new Date(Date.now() - 86400000))
+      const dateLine = now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日 星期' + WEEK[now.getDay()]
       const todayTasks = data.tasks[todayKey] || []
       const yesterdayTasks = data.tasks[yesterdayKey] || []
       const doneToday = todayTasks.filter((t) => t.done).length
       const balance = (data.budget.total || 0) - (data.budget.spent || 0)
       const activeGoals = (data.goals || []).filter((g) => (g.progress || 0) < 100).length
+      const userName = (data.settings && data.settings.userName) || '我的'
 
       function toggleTask(id) { update((d) => { d.tasks[todayKey] = (d.tasks[todayKey] || []).map((x) => x.id === id ? Object.assign({}, x, { done: !x.done }) : x) }) }
       function delTask(id) { update((d) => { d.tasks[todayKey] = (d.tasks[todayKey] || []).filter((x) => x.id !== id) }) }
@@ -538,21 +715,34 @@ return {
 
       let content
       switch (page) {
-        case 'board': content = h(BoardPage, { data, setPage, onClose: props.onClose, todayTasks, yesterdayTasks, doneToday, balance, activeGoals, taskInput, setTaskInput, yInput, setYInput, addTask, delTask, toggleTask, toggleYesterday, delYesterday, addYesterday, toggle: toggleList, del: delList }); break
+        case 'board': content = h(BoardPage, { data, setPage, onClose: props.onClose, todayTasks, yesterdayTasks, doneToday, balance, activeGoals, taskInput, setTaskInput, yInput, setYInput, addTask, delTask, toggleTask, toggleYesterday, delYesterday, addYesterday, toggle: toggleList }); break
         case 'schedule': content = h(SchedulePage, { data, update }); break
         case 'habits': content = h(HabitsPage, { data, update }); break
         case 'budget': content = h(BudgetPage, { data, update }); break
         case 'goals': content = h(GoalsPage, { data, update }); break
         case 'tasks': content = h(TasksPage, { data, update, todayKey, yesterdayKey, todayTasks, yesterdayTasks }); break
         case 'brief': content = h(BriefingsPage, { data, update }); break
+        case 'topic': content = h(TopicsPage, { data, update }); break
+        case 'books': content = h(BooksPage, { data, update }); break
+        case 'review': content = h(ReviewPage, { data, update, todayKey, dateLine }); break
+        case 'center': content = h(CenterPage, { data, update }); break
+        case 'settings': content = h(SettingsPage, { data, update }); break
         default: content = h(Placeholder, { id: page })
       }
       return h('div', { className: 'wb-root' },
-        h(Sidebar, { page, setPage, onClose: props.onClose }),
+        h(Sidebar, { page, setPage, onClose: props.onClose, userName }),
         h('div', { className: 'wb-main' }, content))
     }
 
-    // ------- Slot 注册 -------
+    function Placeholder(props) {
+      const nav = NAV.find((n) => n.id === props.id) || {}
+      return h('div', { className: 'wb-page' },
+        h('div', { className: 'wb-placeholder' },
+          h('div', { className: 'wb-placeholder-icon' }, nav.icon || '🚧'),
+          h('div', { className: 'wb-placeholder-title' }, (nav.label || '') + ' · 建设中'),
+          h('div', { className: 'wb-placeholder-sub' }, '该模块正在打磨，敬请期待')))
+    }
+
     slots.inject('sidebar.footer.action', () => slots.register(
       { name: 'sidebar.footer.action', id: 'workbench.open', order: 20, label: '工作台' },
       (props) => h('button', { className: 'wb-open-btn', onClick: () => setOpen(!open), title: '打开个人工作台' },
@@ -576,5 +766,5 @@ return {
         return h('div', null, fab, h(Workbench, { onClose: () => setOpen(false) }))
       }
     ))
-  },
+  }
 }
