@@ -38,8 +38,40 @@ return {
 .wb-kpi-bar-track{height:6px;border-radius:4px;background:#efeaf6;overflow:hidden;}
 .wb-kpi-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#b9b0ea,#8f86d8);}
 .wb-kpi-bar-text{font-size:10.5px;color:#8a83a8;margin-top:4px;}
-.wb-row3{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;align-items:start;}
-.wb-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px;align-items:start;}
+/* 对称等高布局：中排三栏 / 下排两栏 */
+.wb-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;align-items:stretch;}
+.wb-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;}
+.wb-row3 .wb-panel,.wb-grid2 .wb-panel{display:flex;flex-direction:column;height:100%;min-height:230px;}
+.wb-row3 .wb-panel .wb-list,.wb-grid2 .wb-panel .wb-list{flex:1;}
+.wb-panel .wb-list{flex:1;}
+@media (max-width:1100px){.wb-row3{grid-template-columns:1fr 1fr;}.wb-grid2{grid-template-columns:1fr;}}
+@media (max-width:760px){.wb-row3{grid-template-columns:1fr;}}
+/* 日程时间线 */
+.wb-sched-list{flex:1;display:flex;flex-direction:column;gap:0;}
+.wb-sched-item{display:flex;gap:12px;padding:7px 4px;position:relative;}
+.wb-sched-item:not(:last-child)::after{content:'';position:absolute;left:17px;top:28px;bottom:-6px;width:2px;background:#ece5f4;border-radius:1px;}
+.wb-sched-dot{width:12px;height:12px;border-radius:50%;background:#fff;border:2.5px solid #b9b0ea;flex-shrink:0;margin-top:6px;}
+.wb-sched-item.done .wb-sched-dot{background:#8f86d8;border-color:#8f86d8;}
+.wb-sched-body{flex:1;min-width:0;}
+.wb-sched-body .wb-sched-time{font-size:11px;font-weight:700;color:#8f86d8;background:none;padding:0;margin-bottom:2px;}
+.wb-sched-body .wb-sched-text{font-size:13px;color:#4a4460;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wb-sched-item.done .wb-sched-text{text-decoration:line-through;color:#a8a0bc;}
+/* 习惯进度 */
+.wb-habit-progress{height:8px;border-radius:5px;background:#efeaf6;overflow:hidden;margin-bottom:12px;}
+.wb-habit-progress-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#c9c2f2,#8f86d8);}
+/* OKR / KR */
+.wb-okr-row{background:#f8f5f0;border:1px solid #f0eae0;border-radius:12px;padding:12px 14px;margin-bottom:10px;}
+.wb-okr-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.wb-okr-title{flex:1;font-size:13.5px;font-weight:700;color:#3c3560;}
+.wb-okr-pct{font-size:12px;font-weight:800;color:#8f86d8;}
+.wb-kr-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:#fffdf8;margin-bottom:6px;}
+.wb-kr-row:last-child{margin-bottom:0;}
+.wb-kr-text{flex:1;font-size:12.5px;color:#4a4460;min-width:0;}
+.wb-kr-pct{font-size:11.5px;font-weight:700;color:#8f86d8;width:36px;text-align:right;}
+.wb-kr-add-row{display:flex;gap:6px;margin-top:8px;}
+.wb-kr-input{flex:1;border:1px solid #e5def0;background:#fff;border-radius:8px;padding:5px 10px;font-size:12px;color:#403a4d;font-family:inherit;outline:none;min-width:0;}
+.wb-kr-input:focus{border-color:#b9b0ea;}
+.wb-kr-add-btn{border:none;background:linear-gradient(135deg,#b9b0ea,#8f86d8);color:#fff;font-size:12px;font-weight:600;padding:5px 12px;border-radius:8px;cursor:pointer;flex-shrink:0;font-family:inherit;}
 .wb-panel{background:#fffdf8;border:1px solid #ece5f4;border-radius:16px;padding:16px 18px;box-shadow:0 2px 10px rgba(120,110,160,.06);}
 .wb-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .wb-panel-title{font-size:14.5px;font-weight:800;color:#3c3560;}
@@ -164,8 +196,15 @@ return {
         ],
         budget: { total: 8000, spent: 3200 },
         goals: [
-          { id: 'g1', title: '季度 OKR：内容矩阵 12 篇', progress: 40 },
-          { id: 'g2', title: '读完《爱的博弈》', progress: 60 }
+          { id: 'g1', title: '季度 OKR：内容矩阵 12 篇', progress: 53, krs: [
+            { id: 'kr11', title: '发布 3 篇深度长文', progress: 60 },
+            { id: 'kr12', title: '小红书周更 2 条', progress: 50 },
+            { id: 'kr13', title: '视频号月更 4 条', progress: 50 }
+          ] },
+          { id: 'g2', title: '读完《爱的博弈》', progress: 60, krs: [
+            { id: 'kr21', title: '精读全书', progress: 70 },
+            { id: 'kr22', title: '输出读书笔记', progress: 50 }
+          ] }
         ],
         books: { reading: 2, finished: 2 },
         streak: 1,
@@ -211,6 +250,7 @@ return {
       if (!out.briefings || !out.briefings.length) out.briefings = base.briefings
       if (!out.budget || typeof out.budget.total !== 'number') out.budget = base.budget
       if (!Array.isArray(out.goals)) out.goals = base.goals
+      out.goals.forEach((g) => { if (!Array.isArray(g.krs)) g.krs = [] })
       if (!out.books || typeof out.books.reading !== 'number') out.books = base.books
       if (typeof out.streak !== 'number') out.streak = base.streak
       if (!out.quote) out.quote = base.quote
@@ -315,11 +355,14 @@ return {
       ]
       const kpiGrid = h('div', { className: 'wb-kpi-grid' }, kpis.map((k, i) => h(KpiCard, Object.assign({ key: i }, k))))
 
+      const schedList = (p.data.schedule || []).slice(0, 5)
       const schedPanel = h(Panel, { title: '🗓 今日日程', action: { text: '管理日程 →', onClick: () => p.setPage('schedule') } },
-        h('div', { className: 'wb-list' }, (p.data.schedule || []).slice(0, 4).map((s) => h('div', { key: s.id, className: 'wb-sched-row' + (s.done ? ' done' : '') },
-          h('div', { className: 'wb-sched-time' }, s.time || ''),
-          h('div', { className: 'wb-sched-text' }, s.text),
-          h(Check, { done: s.done, onClick: () => p.toggle('schedule', s.id) })))))
+        schedList.length ? h('div', { className: 'wb-sched-list' }, schedList.map((s) => h('div', { key: s.id, className: 'wb-sched-item' + (s.done ? ' done' : '') },
+          h('div', { className: 'wb-sched-dot' }),
+          h('div', { className: 'wb-sched-body' },
+            h('div', { className: 'wb-sched-time' }, s.time || '全天'),
+            h('div', { className: 'wb-sched-text' }, s.text)),
+          h(Check, { done: s.done, onClick: () => p.toggle('schedule', s.id) })))) : h('div', { className: 'wb-empty' }, '今天还没有日程'))
 
       const briefPanel = h(Panel, { title: '📰 最新 AI 简报', action: { text: '去热点简报 →', onClick: () => p.setPage('brief') } },
         h('div', { className: 'wb-list' }, (p.data.briefings || []).slice(0, 4).map((b, i) => h('div', { key: b.id, className: 'wb-brief-row' },
@@ -328,11 +371,16 @@ return {
           h('span', { className: 'wb-brief-tag' }, b.tag || '选题')))),
         h('div', { style: { fontSize: 11, color: '#a099b8', marginTop: 10, textAlign: 'center' } }, '四任务重点聚合 · 每日自动更新'))
 
+      const habits = p.data.habits || []
+      const habitDoneN = habits.filter((x) => x.done).length
+      const habitPct = habits.length ? Math.round((habitDoneN / habits.length) * 100) : 0
       const habitPanel = h(Panel, { title: '🌱 今日习惯', action: { text: '全部 →', onClick: () => p.setPage('habits') } },
-        h('div', { className: 'wb-list' }, (p.data.habits || []).map((x) => h('div', { key: x.id, className: 'wb-habit-row' + (x.done ? ' done' : '') },
+        h('div', { className: 'wb-habit-progress' }, h('div', { className: 'wb-habit-progress-fill', style: { width: habitPct + '%' } })),
+        h('div', { className: 'wb-list' }, habits.map((x) => h('div', { key: x.id, className: 'wb-habit-row' + (x.done ? ' done' : '') },
           h('span', { className: 'wb-habit-icon' }, x.icon || '⭐'),
           h('span', { className: 'wb-habit-name' }, x.name),
-          h(Check, { done: x.done, onClick: () => p.toggle('habits', x.id) })))))
+          h(Check, { done: x.done, onClick: () => p.toggle('habits', x.id) })))),
+        h('div', { style: { fontSize: 11, color: '#a099b8', marginTop: 10, textAlign: 'center' } }, '今日完成 ' + habitDoneN + ' / ' + habits.length + ' · ' + habitPct + '%'))
 
       const row3 = h('div', { className: 'wb-row3' }, schedPanel, briefPanel, habitPanel)
 
@@ -357,12 +405,18 @@ return {
         h('div', { className: 'wb-budget-track' }, h('div', { className: 'wb-budget-fill', style: { width: Math.min(100, budgetPct) + '%' } })),
         h('div', { className: 'wb-budget-meta' }, '已支出 ' + p.data.budget.spent + ' / ' + p.data.budget.total + ' 元 · ' + budgetPct + '%'))
 
-      const goalPanel = h(Panel, { title: '🎯 目标进度', action: { text: '管理 →', onClick: () => p.setPage('goals') } },
-        h('div', { className: 'wb-list' }, (p.data.goals || []).slice(0, 4).map((g) => h('div', { key: g.id, className: 'wb-goal-row' },
-          h('div', { className: 'wb-goal-top' },
-            h('span', { className: 'wb-goal-title' }, g.title),
-            h('span', { className: 'wb-goal-pct' }, (g.progress || 0) + '%')),
-          h('div', { className: 'wb-budget-track' }, h('div', { className: 'wb-budget-fill', style: { width: Math.min(100, g.progress || 0) + '%' } }))))))
+      const goalPanel = h(Panel, { title: '🎯 目标进度（OKR）', action: { text: '管理 →', onClick: () => p.setPage('goals') } },
+        h('div', { className: 'wb-list' }, (p.data.goals || []).slice(0, 3).map((g) => {
+          const krs = g.krs || []
+          return h('div', { key: g.id, className: 'wb-okr-row' },
+            h('div', { className: 'wb-okr-head' },
+              h('span', { className: 'wb-okr-title' }, g.title),
+              h('span', { className: 'wb-okr-pct' }, (g.progress || 0) + '%')),
+            h('div', { className: 'wb-budget-track' }, h('div', { className: 'wb-budget-fill', style: { width: Math.min(100, g.progress || 0) + '%' } })),
+            krs.slice(0, 3).map((k) => h('div', { key: k.id, className: 'wb-kr-row' },
+              h('span', { className: 'wb-kr-text' }, k.title),
+              h('span', { className: 'wb-kr-pct' }, (k.progress || 0) + '%'))))
+        })))
 
       const grid2 = h('div', { className: 'wb-grid2' }, todayPanel, yesterdayPanel, budgetPanel, goalPanel)
       return h('div', { className: 'wb-page' }, hero, kpiGrid, row3, grid2)
@@ -433,23 +487,68 @@ return {
                 '· 输入数字即时更新预算进度\n· 可支配余额 = 总额 − 已支出\n· 建议每月初重置预算额度')))))
     }
 
+    function GoalBlock(props) {
+      const [krTitle, setKrTitle] = React.useState('')
+      function addKr() {
+        if (!krTitle.trim()) return
+        props.update((d) => {
+          const g = d.goals.find((x) => x.id === props.g.id)
+          if (!g) return
+          if (!Array.isArray(g.krs)) g.krs = []
+          g.krs.push({ id: uid(), title: krTitle.trim(), progress: 0 })
+          g.progress = Math.round(g.krs.reduce((s, k) => s + (k.progress || 0), 0) / g.krs.length)
+        })
+        setKrTitle('')
+      }
+      function setKr(id, progress) {
+        props.update((d) => {
+          const g = d.goals.find((x) => x.id === props.g.id)
+          if (!g) return
+          const k = (g.krs || []).find((y) => y.id === id)
+          if (!k) return
+          k.progress = progress
+          g.progress = Math.round(g.krs.reduce((s, x) => s + (x.progress || 0), 0) / g.krs.length)
+        })
+      }
+      function delKr(id) {
+        props.update((d) => {
+          const g = d.goals.find((x) => x.id === props.g.id)
+          if (!g) return
+          g.krs = (g.krs || []).filter((y) => y.id !== id)
+          g.progress = g.krs.length ? Math.round(g.krs.reduce((s, x) => s + (x.progress || 0), 0) / g.krs.length) : 0
+        })
+      }
+      const krs = props.g.krs || []
+      return h('div', { className: 'wb-okr-row' },
+        h('div', { className: 'wb-okr-head' },
+          h('span', { className: 'wb-okr-title' }, props.g.title),
+          h('span', { className: 'wb-okr-pct' }, (props.g.progress || 0) + '%'),
+          h(DelBtn, { onClick: () => props.update((d) => { d.goals = d.goals.filter((x) => x.id !== props.g.id) }) })),
+        h('div', { className: 'wb-range-wrap' },
+          h('input', { className: 'wb-range', type: 'range', min: 0, max: 100, step: 5, value: props.g.progress || 0, onChange: (e) => props.update((d) => { const x = d.goals.find((y) => y.id === props.g.id); if (x) x.progress = Number(e.target.value) }) })),
+        h('div', { style: { fontSize: 11, color: '#8a83a8', fontWeight: 700, margin: '10px 0 6px' } }, '关键结果 KR'),
+        krs.map((k) => h('div', { key: k.id, className: 'wb-kr-row' },
+          h('span', { className: 'wb-kr-text' }, k.title),
+          h('input', { className: 'wb-range', type: 'range', min: 0, max: 100, step: 5, value: k.progress || 0, onChange: (e) => setKr(k.id, Number(e.target.value)), style: { flex: 1, maxWidth: 140 } }),
+          h('span', { className: 'wb-kr-pct' }, (k.progress || 0) + '%'),
+          h(DelBtn, { onClick: () => delKr(k.id) }))),
+        krs.length === 0 ? h('div', { className: 'wb-empty' }, '还没有 KR，添加第一个关键结果') : null,
+        h('div', { className: 'wb-kr-add-row' },
+          h('input', { className: 'wb-kr-input', placeholder: '新增 KR，如：发布 3 篇深度文章', value: krTitle, onChange: (e) => setKrTitle(e.target.value), onKeyDown: (e) => { if (e.key === 'Enter') addKr() } }),
+          h('button', { className: 'wb-kr-add-btn', onClick: addKr }, '+ KR')))
+    }
+
     function GoalsPage(p) {
       const [title, setTitle] = React.useState('')
       function add() {
         if (!title.trim()) return
-        p.update((d) => { d.goals.push({ id: uid(), title: title.trim(), progress: 0 }) })
+        p.update((d) => { d.goals.push({ id: uid(), title: title.trim(), progress: 0, krs: [] }) })
         setTitle('')
       }
       return h('div', { className: 'wb-page' },
-        h(PageHead, { icon: '🏆', title: '目标管理', sub: '跟踪 OKR 与长期目标进度' },
-          h('div', { className: 'wb-list', style: { marginTop: 14 } }, (p.data.goals || []).map((g) => h('div', { key: g.id, className: 'wb-goal-row' },
-            h('div', { className: 'wb-goal-top' },
-              h('span', { className: 'wb-goal-title' }, g.title),
-              h('span', { className: 'wb-goal-pct' }, (g.progress || 0) + '%'),
-              h(DelBtn, { onClick: () => p.update((d) => { d.goals = d.goals.filter((x) => x.id !== g.id) }) })),
-            h('div', { className: 'wb-range-wrap' },
-              h('input', { className: 'wb-range', type: 'range', min: 0, max: 100, step: 5, value: g.progress || 0, onChange: (e) => p.update((d) => { const x = d.goals.find((y) => y.id === g.id); if (x) x.progress = Number(e.target.value) }) }))))),
-          h(InputRow, { placeholder: '新增目标，如：读完 12 本书', value: title, onChange: setTitle, onAdd: add, addText: '添加' })))
+        h(PageHead, { icon: '🏆', title: '目标管理', sub: 'OKR 目标 + 关键结果（KR）逐项编辑，目标进度 = KR 平均' },
+          h('div', { style: { marginTop: 14 } }, (p.data.goals || []).map((g) => h(GoalBlock, { key: g.id, g, update: p.update }))),
+          h(InputRow, { placeholder: '新增目标（OKR），如：读完 12 本书', value: title, onChange: setTitle, onAdd: add, addText: '添加目标' })))
     }
 
     function TasksPage(p) {
