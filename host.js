@@ -29,8 +29,15 @@ return {
         ],
         budget: { total: 8000, spent: 3200 },
         goals: [
-          { id: 'g1', title: '季度 OKR：内容矩阵 12 篇', progress: 40 },
-          { id: 'g2', title: '读完《爱的博弈》', progress: 60 }
+          { id: 'g1', title: '季度 OKR：内容矩阵 12 篇', progress: 53, krs: [
+            { id: 'kr11', title: '发布 3 篇深度长文', progress: 60 },
+            { id: 'kr12', title: '小红书周更 2 条', progress: 50 },
+            { id: 'kr13', title: '视频号月更 4 条', progress: 50 }
+          ] },
+          { id: 'g2', title: '读完《爱的博弈》', progress: 60, krs: [
+            { id: 'kr21', title: '精读全书', progress: 70 },
+            { id: 'kr22', title: '输出读书笔记', progress: 50 }
+          ] }
         ],
         books: { reading: 2, finished: 2 },
         streak: 1,
