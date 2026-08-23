@@ -103,6 +103,17 @@ return {
 .wb-budget-track{height:10px;border-radius:6px;background:#efeaf6;overflow:hidden;margin-top:10px;}
 .wb-budget-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#c9c2f2,#8f86d8);}
 .wb-budget-meta{font-size:12px;color:#8a83a8;margin-top:8px;}
+.wb-cat-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;background:#f8f5f0;border:1px solid #f0eae0;}
+.wb-cat-icon{font-size:14px;flex-shrink:0;}
+.wb-cat-name{font-size:12.5px;color:#4a4460;width:58px;flex-shrink:0;}
+.wb-cat-track{flex:1;height:6px;border-radius:4px;background:#efeaf6;overflow:hidden;}
+.wb-cat-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#c9c2f2,#8f86d8);}
+.wb-cat-amt{font-size:12.5px;font-weight:800;color:#38315c;flex-shrink:0;}
+.wb-exp-row{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;background:#f8f5f0;border:1px solid #f0eae0;}
+.wb-exp-cat{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0;background:#eee9fa;color:#8f86d8;}
+.wb-exp-note{flex:1;font-size:12.5px;color:#4a4460;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.wb-exp-amt{font-size:12.5px;font-weight:800;color:#38315c;flex-shrink:0;}
+.wb-exp-date{font-size:10.5px;color:#a099b8;flex-shrink:0;}
 .wb-goal-row{padding:10px;border-radius:10px;background:#f8f5f0;border:1px solid #f0eae0;}
 .wb-goal-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
 .wb-goal-title{flex:1;font-size:13px;color:#4a4460;min-width:0;}
@@ -173,6 +184,17 @@ return {
       ocean: { accent: '#5b93c9', accent2: '#a5c8e8', dark: '#3b76ad' }
     }
     const THEME_LABELS = { lavender: '薰衣草', mint: '薄荷', peach: '蜜桃', ocean: '海洋' }
+    const EXP_CATS = [
+      { key: '餐饮', icon: '🍜', color: 'amber' },
+      { key: '交通', icon: '🚕', color: 'blue' },
+      { key: '付费学习', icon: '💻', color: 'lavender' },
+      { key: '购物', icon: '🛍️', color: 'green' },
+      { key: '居住', icon: '🏠', color: 'gray' },
+      { key: '娱乐', icon: '🎮', color: 'blue' },
+      { key: '医疗', icon: '💊', color: 'amber' },
+      { key: '其他', icon: '📦', color: 'gray' }
+    ]
+    const goalPct = (g) => { const krs = (g && g.krs) || []; return krs.length ? Math.round(krs.reduce((s, k) => s + (k.progress || 0), 0) / krs.length) : 0 }
 
     function defaults() {
       const now = new Date()
@@ -194,14 +216,21 @@ return {
           { id: 'b3', title: 'OpenAI 推出前沿模型零数据留存，企业客户终于能放心用 API？', tag: '选题雷达' },
           { id: 'b4', title: '为前沿模型提供零数据留存 / Zero-Data...', tag: '选题雷达' }
         ],
-        budget: { total: 8000, spent: 3200 },
+        budget: { total: 8000, spent: 0 },
+        expenses: [
+          { id: 'ex1', date: key, amount: 38, cat: '餐饮', note: '午餐外卖' },
+          { id: 'ex2', date: key, amount: 46, cat: '交通', note: '打车去公司' },
+          { id: 'ex3', date: key, amount: 199, cat: '付费学习', note: 'AI 课程月卡' },
+          { id: 'ex4', date: yk, amount: 120, cat: '餐饮', note: '和朋友聚餐' },
+          { id: 'ex5', date: yk, amount: 25, cat: '交通', note: '地铁 + 共享单车' }
+        ],
         goals: [
-          { id: 'g1', title: '季度 OKR：内容矩阵 12 篇', progress: 53, krs: [
+          { id: 'g1', title: '季度内容矩阵：系统化产出 12 篇深度内容', krs: [
             { id: 'kr11', title: '发布 3 篇深度长文', progress: 60 },
-            { id: 'kr12', title: '小红书周更 2 条', progress: 50 },
-            { id: 'kr13', title: '视频号月更 4 条', progress: 50 }
+            { id: 'kr12', title: '小红书每周更新 2 条', progress: 50 },
+            { id: 'kr13', title: '视频号每月更新 4 条', progress: 50 }
           ] },
-          { id: 'g2', title: '读完《爱的博弈》', progress: 60, krs: [
+          { id: 'g2', title: '精读《爱的博弈》并输出读书笔记', krs: [
             { id: 'kr21', title: '精读全书', progress: 70 },
             { id: 'kr22', title: '输出读书笔记', progress: 50 }
           ] }
@@ -251,6 +280,12 @@ return {
       if (!out.budget || typeof out.budget.total !== 'number') out.budget = base.budget
       if (!Array.isArray(out.goals)) out.goals = base.goals
       out.goals.forEach((g) => { if (!Array.isArray(g.krs)) g.krs = [] })
+      if (!Array.isArray(out.expenses)) out.expenses = []
+      if (out.budget && out.budget.spent > 0 && !out.expenses.length) {
+        const first = dateKey(new Date(now.getFullYear(), now.getMonth(), 1))
+        out.expenses.push({ id: uid(), date: first, amount: out.budget.spent, cat: '其他', note: '历史支出' })
+        out.budget.spent = 0
+      }
       if (!out.books || typeof out.books.reading !== 'number') out.books = base.books
       if (typeof out.streak !== 'number') out.streak = base.streak
       if (!out.quote) out.quote = base.quote
@@ -341,7 +376,7 @@ return {
           h('div', { className: 'wb-hero-quote' }, p.data.quote || '')),
         h('button', { className: 'wb-close-btn', onClick: p.onClose, title: '关闭工作台' }, '✕'))
 
-      const budgetPct = p.data.budget.total > 0 ? Math.round((p.data.budget.spent / p.data.budget.total) * 100) : 0
+      const budgetPct = p.data.budget.total > 0 ? Math.round(((p.monthSpent || 0) / p.data.budget.total) * 100) : 0
       const readingN = (p.data.bookList || []).filter((b) => b.status === 'reading').length
       const finishedN = (p.data.bookList || []).filter((b) => b.status === 'finished').length
       const todoN = (p.data.centerTasks || []).filter((t) => !t.done).length
@@ -398,21 +433,29 @@ return {
           h(DelBtn, { onClick: () => p.delYesterday(t.id) }))) : h('div', { className: 'wb-empty' }, '补记昨天完成的事，回车记录 ✍️')),
         h(InputRow, { placeholder: '补记昨天完成的事，回车记录', value: p.yInput, onChange: p.setYInput, onAdd: p.addYesterday, addText: '补记' }))
 
-      const budgetPanel = h(Panel, { title: '💳 本月预算', action: { text: '明细 →', onClick: () => p.setPage('budget') } },
+      const catAgg = {}
+      (p.data.expenses || []).filter((e) => (e.date || '').indexOf(dateKey(now).slice(0, 7)) === 0).forEach((e) => { catAgg[e.cat] = (catAgg[e.cat] || 0) + (Number(e.amount) || 0) })
+      const topCats = Object.keys(catAgg).sort((a, b) => catAgg[b] - catAgg[a]).slice(0, 3)
+      const budgetPanel = h(Panel, { title: '💳 本月支出', action: { text: '明细 →', onClick: () => p.setPage('budget') } },
         h('div', { className: 'wb-budget-hero' },
-          h('div', { className: 'wb-budget-num' }, String(p.balance)),
-          h('span', { style: { fontSize: 12, color: '#8a83a8' } }, '元 可支配余额')),
+          h('div', { className: 'wb-budget-num' }, String(p.monthSpent)),
+          h('span', { style: { fontSize: 12, color: '#8a83a8' } }, '元 已支出 / 预算 ' + p.data.budget.total + ' 元')),
         h('div', { className: 'wb-budget-track' }, h('div', { className: 'wb-budget-fill', style: { width: Math.min(100, budgetPct) + '%' } })),
-        h('div', { className: 'wb-budget-meta' }, '已支出 ' + p.data.budget.spent + ' / ' + p.data.budget.total + ' 元 · ' + budgetPct + '%'))
+        h('div', { className: 'wb-budget-meta' }, '剩余 ' + p.balance + ' 元 · 已用 ' + budgetPct + '%'),
+        topCats.length ? h('div', { className: 'wb-list', style: { marginTop: 10 } }, topCats.map((c) => h('div', { key: c, className: 'wb-exp-row' },
+          h('span', { className: 'wb-exp-cat' }, c),
+          h('span', { className: 'wb-exp-note' }, '本月 ' + catAgg[c] + ' 元'),
+          h('span', { className: 'wb-exp-amt' }, Math.round((catAgg[c] / (p.monthSpent || 1)) * 100) + '%')))) : null)
 
-      const goalPanel = h(Panel, { title: '🎯 目标进度（OKR）', action: { text: '管理 →', onClick: () => p.setPage('goals') } },
+      const goalPanel = h(Panel, { title: '🎯 OKR 目标', action: { text: '管理 →', onClick: () => p.setPage('goals') } },
         h('div', { className: 'wb-list' }, (p.data.goals || []).slice(0, 3).map((g) => {
           const krs = g.krs || []
+          const gp = goalPct(g)
           return h('div', { key: g.id, className: 'wb-okr-row' },
             h('div', { className: 'wb-okr-head' },
               h('span', { className: 'wb-okr-title' }, g.title),
-              h('span', { className: 'wb-okr-pct' }, (g.progress || 0) + '%')),
-            h('div', { className: 'wb-budget-track' }, h('div', { className: 'wb-budget-fill', style: { width: Math.min(100, g.progress || 0) + '%' } })),
+              h('span', { className: 'wb-okr-pct' }, gp + '%')),
+            h('div', { className: 'wb-budget-track' }, h('div', { className: 'wb-budget-fill', style: { width: Math.min(100, gp) + '%' } })),
             krs.slice(0, 3).map((k) => h('div', { key: k.id, className: 'wb-kr-row' },
               h('span', { className: 'wb-kr-text' }, k.title),
               h('span', { className: 'wb-kr-pct' }, (k.progress || 0) + '%'))))
@@ -463,28 +506,67 @@ return {
 
     function BudgetPage(p) {
       const b = p.data.budget
-      const pct = b.total > 0 ? Math.round((b.spent / b.total) * 100) : 0
-      const setNum = (key) => (e) => {
-        const v = Number(e.target.value)
-        p.update((d) => { d.budget[key] = isNaN(v) || v < 0 ? 0 : v })
+      const now = new Date()
+      const ym = dateKey(now).slice(0, 7)
+      const exps = (p.data.expenses || []).filter((e) => (e.date || '').indexOf(ym) === 0)
+      const monthSpent = exps.reduce((s, e) => s + (Number(e.amount) || 0), 0)
+      const pct = b.total > 0 ? Math.round((monthSpent / b.total) * 100) : 0
+      const catMap = {}
+      exps.forEach((e) => { catMap[e.cat] = (catMap[e.cat] || 0) + (Number(e.amount) || 0) })
+      const catList = EXP_CATS.map((c) => ({ key: c.key, icon: c.icon, color: c.color, amt: catMap[c.key] || 0 })).filter((c) => c.amt > 0).sort((a, c2) => c2.amt - a.amt)
+      const [amount, setAmount] = React.useState('')
+      const [cat, setCat] = React.useState('餐饮')
+      const [note, setNote] = React.useState('')
+      function add() {
+        const v = Number(amount)
+        if (!v || v <= 0) return
+        p.update((d) => { if (!Array.isArray(d.expenses)) d.expenses = []; d.expenses.push({ id: uid(), date: dateKey(new Date()), amount: Math.round(v * 100) / 100, cat, note: note.trim() }) })
+        setAmount(''); setNote('')
       }
+      const byDate = {}
+      exps.slice().sort((a, e) => (e.date || '').localeCompare(a.date || '')).forEach((e) => { byDate[e.date] = byDate[e.date] || []; byDate[e.date].push(e) })
+      const dateGroups = Object.keys(byDate).map((d) => {
+        const list = byDate[d]
+        const dayTotal = list.reduce((s, e) => s + (Number(e.amount) || 0), 0)
+        return h('div', { key: d, style: { marginBottom: 10 } },
+          h('div', { style: { fontSize: 11, fontWeight: 700, color: '#8a83a8', margin: '8px 2px 6px', display: 'flex', justifyContent: 'space-between' } },
+            h('span', null, d), h('span', null, '¥' + dayTotal)),
+          h('div', { className: 'wb-list' }, list.map((e) => h('div', { key: e.id, className: 'wb-exp-row' },
+            h('span', { className: 'wb-exp-cat' }, e.cat),
+            h('span', { className: 'wb-exp-note' }, e.note || '无备注'),
+            h('span', { className: 'wb-exp-amt' }, '¥' + e.amount),
+            h(DelBtn, { onClick: () => p.update((d) => { d.expenses = (d.expenses || []).filter((x) => x.id !== e.id) }) })))))
+      })
       return h('div', { className: 'wb-page' },
-        h(PageHead, { icon: '💳', title: '开销记账', sub: '本月收支概览' },
+        h(PageHead, { icon: '💳', title: '开销记账', sub: '每天记一笔，按大类汇总：餐饮 / 交通 / 付费学习…' },
           h('div', { className: 'wb-grid2', style: { marginTop: 16 } },
             h('div', { className: 'wb-panel' },
-              h('div', { className: 'wb-panel-title' }, '本月预算'),
+              h('div', { className: 'wb-panel-title' }, '本月概览'),
               h('div', { className: 'wb-budget-hero', style: { marginTop: 12 } },
-                h('div', { className: 'wb-budget-num' }, String(b.total - b.spent)),
-                h('span', { style: { fontSize: 12, color: '#8a83a8' } }, '元 可支配')),
+                h('div', { className: 'wb-budget-num' }, String(monthSpent)),
+                h('span', { style: { fontSize: 12, color: '#8a83a8' } }, '元 已支出 / 预算 ' + b.total + ' 元')),
               h('div', { className: 'wb-budget-track' }, h('div', { className: 'wb-budget-fill', style: { width: Math.min(100, pct) + '%' } })),
-              h('div', { className: 'wb-budget-meta' }, '已支出 ' + b.spent + ' / ' + b.total + ' 元 · ' + pct + '%'),
+              h('div', { className: 'wb-budget-meta' }, '剩余 ' + Math.max(0, b.total - monthSpent) + ' 元 · 已用 ' + pct + '%'),
+              h('div', { className: 'wb-input-row', style: { marginTop: 12 } },
+                h('input', { className: 'wb-input', type: 'number', min: 0, placeholder: '预算总额', value: String(b.total), onChange: (e) => { const v = Number(e.target.value); p.update((d) => { d.budget.total = isNaN(v) || v < 0 ? 0 : v }) }, style: { maxWidth: 130 } })),
+              h('div', { className: 'wb-panel-title', style: { marginTop: 16 } }, '记一笔支出'),
               h('div', { className: 'wb-input-row' },
-                h('input', { className: 'wb-input', type: 'number', min: 0, placeholder: '预算总额', value: String(b.total), onChange: setNum('total') }),
-                h('input', { className: 'wb-input', type: 'number', min: 0, placeholder: '已支出', value: String(b.spent), onChange: setNum('spent') }))),
+                h('input', { className: 'wb-input', type: 'number', min: 0, step: '0.01', placeholder: '金额，如 38', value: amount, onChange: (e) => setAmount(e.target.value), style: { maxWidth: 110 } }),
+                h('select', { className: 'wb-input', value: cat, onChange: (e) => setCat(e.target.value), style: { maxWidth: 130 } },
+                  EXP_CATS.map((c) => h('option', { key: c.key, value: c.key }, c.icon + ' ' + c.key)))),
+              h('div', { className: 'wb-input-row' },
+                h('input', { className: 'wb-input', placeholder: '备注，如：午餐外卖 / AI 课程月卡', value: note, onChange: (e) => setNote(e.target.value), onKeyDown: (e) => { if (e.key === 'Enter') add() } }),
+                h('button', { className: 'wb-add-btn', onClick: add }, '记录'))),
             h('div', { className: 'wb-panel' },
-              h('div', { className: 'wb-panel-title' }, '记账提示'),
-              h('div', { style: { fontSize: 13, color: '#6d6590', lineHeight: 1.8, marginTop: 10 } },
-                '· 输入数字即时更新预算进度\n· 可支配余额 = 总额 − 已支出\n· 建议每月初重置预算额度')))))
+              h('div', { className: 'wb-panel-title' }, '本月分类统计'),
+              catList.length ? h('div', { className: 'wb-list', style: { marginTop: 10 } }, catList.map((c) => h('div', { key: c.key, className: 'wb-cat-row' },
+                h('span', { className: 'wb-cat-icon' }, c.icon),
+                h('span', { className: 'wb-cat-name' }, c.key),
+                h('div', { className: 'wb-cat-track' }, h('div', { className: 'wb-cat-fill', style: { width: Math.min(100, Math.round((c.amt / (monthSpent || 1)) * 100)) + '%' } })),
+                h('span', { className: 'wb-cat-amt' }, '¥' + c.amt)))) : h('div', { className: 'wb-empty' }, '本月还没有支出记录'))),
+          h('div', { className: 'wb-panel', style: { marginTop: 16 } },
+            h('div', { className: 'wb-panel-title' }, '支出明细（按天）'),
+            dateGroups.length ? h('div', null, dateGroups) : h('div', { className: 'wb-empty' }, '还没有支出，用上方表单记第一笔'))))
     }
 
     function GoalBlock(props) {
@@ -496,7 +578,6 @@ return {
           if (!g) return
           if (!Array.isArray(g.krs)) g.krs = []
           g.krs.push({ id: uid(), title: krTitle.trim(), progress: 0 })
-          g.progress = Math.round(g.krs.reduce((s, k) => s + (k.progress || 0), 0) / g.krs.length)
         })
         setKrTitle('')
       }
@@ -505,9 +586,7 @@ return {
           const g = d.goals.find((x) => x.id === props.g.id)
           if (!g) return
           const k = (g.krs || []).find((y) => y.id === id)
-          if (!k) return
-          k.progress = progress
-          g.progress = Math.round(g.krs.reduce((s, x) => s + (x.progress || 0), 0) / g.krs.length)
+          if (k) k.progress = progress
         })
       }
       function delKr(id) {
@@ -515,24 +594,23 @@ return {
           const g = d.goals.find((x) => x.id === props.g.id)
           if (!g) return
           g.krs = (g.krs || []).filter((y) => y.id !== id)
-          g.progress = g.krs.length ? Math.round(g.krs.reduce((s, x) => s + (x.progress || 0), 0) / g.krs.length) : 0
         })
       }
       const krs = props.g.krs || []
+      const gp = goalPct(props.g)
       return h('div', { className: 'wb-okr-row' },
         h('div', { className: 'wb-okr-head' },
           h('span', { className: 'wb-okr-title' }, props.g.title),
-          h('span', { className: 'wb-okr-pct' }, (props.g.progress || 0) + '%'),
+          h('span', { className: 'wb-okr-pct' }, gp + '%'),
           h(DelBtn, { onClick: () => props.update((d) => { d.goals = d.goals.filter((x) => x.id !== props.g.id) }) })),
-        h('div', { className: 'wb-range-wrap' },
-          h('input', { className: 'wb-range', type: 'range', min: 0, max: 100, step: 5, value: props.g.progress || 0, onChange: (e) => props.update((d) => { const x = d.goals.find((y) => y.id === props.g.id); if (x) x.progress = Number(e.target.value) }) })),
-        h('div', { style: { fontSize: 11, color: '#8a83a8', fontWeight: 700, margin: '10px 0 6px' } }, '关键结果 KR'),
+        h('div', { className: 'wb-budget-track', style: { marginBottom: 6 } }, h('div', { className: 'wb-budget-fill', style: { width: Math.min(100, gp) + '%' } })),
+        h('div', { style: { fontSize: 11, color: '#8a83a8', fontWeight: 700, margin: '10px 0 6px' } }, '关键结果 KR（O 不写数字，进度由 KR 平均）'),
         krs.map((k) => h('div', { key: k.id, className: 'wb-kr-row' },
           h('span', { className: 'wb-kr-text' }, k.title),
           h('input', { className: 'wb-range', type: 'range', min: 0, max: 100, step: 5, value: k.progress || 0, onChange: (e) => setKr(k.id, Number(e.target.value)), style: { flex: 1, maxWidth: 140 } }),
           h('span', { className: 'wb-kr-pct' }, (k.progress || 0) + '%'),
           h(DelBtn, { onClick: () => delKr(k.id) }))),
-        krs.length === 0 ? h('div', { className: 'wb-empty' }, '还没有 KR，添加第一个关键结果') : null,
+        krs.length === 0 ? h('div', { className: 'wb-empty' }, 'O 下面还没有 KR，添加第一个关键结果') : null,
         h('div', { className: 'wb-kr-add-row' },
           h('input', { className: 'wb-kr-input', placeholder: '新增 KR，如：发布 3 篇深度文章', value: krTitle, onChange: (e) => setKrTitle(e.target.value), onKeyDown: (e) => { if (e.key === 'Enter') addKr() } }),
           h('button', { className: 'wb-kr-add-btn', onClick: addKr }, '+ KR')))
@@ -542,13 +620,13 @@ return {
       const [title, setTitle] = React.useState('')
       function add() {
         if (!title.trim()) return
-        p.update((d) => { d.goals.push({ id: uid(), title: title.trim(), progress: 0, krs: [] }) })
+        p.update((d) => { d.goals.push({ id: uid(), title: title.trim(), krs: [] }) })
         setTitle('')
       }
       return h('div', { className: 'wb-page' },
-        h(PageHead, { icon: '🏆', title: '目标管理', sub: 'OKR 目标 + 关键结果（KR）逐项编辑，目标进度 = KR 平均' },
+        h(PageHead, { icon: '🏆', title: '目标管理（OKR）', sub: 'O = 目标（不写数字），KR = 关键结果（写具体数字），O 进度 = KR 平均' },
           h('div', { style: { marginTop: 14 } }, (p.data.goals || []).map((g) => h(GoalBlock, { key: g.id, g, update: p.update }))),
-          h(InputRow, { placeholder: '新增目标（OKR），如：读完 12 本书', value: title, onChange: setTitle, onAdd: add, addText: '添加目标' })))
+          h(InputRow, { placeholder: '新增目标 O，如：季度内容矩阵', value: title, onChange: setTitle, onAdd: add, addText: '添加 O' })))
     }
 
     function TasksPage(p) {
@@ -799,8 +877,10 @@ return {
       const todayTasks = data.tasks[todayKey] || []
       const yesterdayTasks = data.tasks[yesterdayKey] || []
       const doneToday = todayTasks.filter((t) => t.done).length
-      const balance = (data.budget.total || 0) - (data.budget.spent || 0)
-      const activeGoals = (data.goals || []).filter((g) => (g.progress || 0) < 100).length
+      const monthKey = dateKey(now).slice(0, 7)
+      const monthSpent = (data.expenses || []).filter((e) => (e.date || '').indexOf(monthKey) === 0).reduce((s, e) => s + (Number(e.amount) || 0), 0)
+      const balance = (data.budget.total || 0) - monthSpent
+      const activeGoals = (data.goals || []).filter((g) => goalPct(g) < 100).length
       const userName = (data.settings && data.settings.userName) || '我的'
 
       function toggleTask(id) { update((d) => { d.tasks[todayKey] = (d.tasks[todayKey] || []).map((x) => x.id === id ? Object.assign({}, x, { done: !x.done }) : x) }) }
@@ -814,7 +894,7 @@ return {
 
       let content
       switch (page) {
-        case 'board': content = h(BoardPage, { data, setPage, onClose: props.onClose, todayTasks, yesterdayTasks, doneToday, balance, activeGoals, taskInput, setTaskInput, yInput, setYInput, addTask, delTask, toggleTask, toggleYesterday, delYesterday, addYesterday, toggle: toggleList }); break
+        case 'board': content = h(BoardPage, { data, setPage, onClose: props.onClose, todayTasks, yesterdayTasks, doneToday, balance, monthSpent, activeGoals, taskInput, setTaskInput, yInput, setYInput, addTask, delTask, toggleTask, toggleYesterday, delYesterday, addYesterday, toggle: toggleList }); break
         case 'schedule': content = h(SchedulePage, { data, update }); break
         case 'habits': content = h(HabitsPage, { data, update }); break
         case 'budget': content = h(BudgetPage, { data, update }); break
