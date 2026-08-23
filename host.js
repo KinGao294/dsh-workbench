@@ -27,14 +27,21 @@ return {
           { id: 'b3', title: 'OpenAI 推出前沿模型零数据留存，企业客户终于能放心用 API？', tag: '选题雷达' },
           { id: 'b4', title: '为前沿模型提供零数据留存 / Zero-Data...', tag: '选题雷达' }
         ],
-        budget: { total: 8000, spent: 3200 },
+        budget: { total: 8000, spent: 0 },
+        expenses: [
+          { id: 'ex1', date: key, amount: 38, cat: '餐饮', note: '午餐外卖' },
+          { id: 'ex2', date: key, amount: 46, cat: '交通', note: '打车去公司' },
+          { id: 'ex3', date: key, amount: 199, cat: '付费学习', note: 'AI 课程月卡' },
+          { id: 'ex4', date: ykey, amount: 120, cat: '餐饮', note: '和朋友聚餐' },
+          { id: 'ex5', date: ykey, amount: 25, cat: '交通', note: '地铁 + 共享单车' }
+        ],
         goals: [
-          { id: 'g1', title: '季度 OKR：内容矩阵 12 篇', progress: 53, krs: [
+          { id: 'g1', title: '季度内容矩阵：系统化产出 12 篇深度内容', krs: [
             { id: 'kr11', title: '发布 3 篇深度长文', progress: 60 },
-            { id: 'kr12', title: '小红书周更 2 条', progress: 50 },
-            { id: 'kr13', title: '视频号月更 4 条', progress: 50 }
+            { id: 'kr12', title: '小红书每周更新 2 条', progress: 50 },
+            { id: 'kr13', title: '视频号每月更新 4 条', progress: 50 }
           ] },
-          { id: 'g2', title: '读完《爱的博弈》', progress: 60, krs: [
+          { id: 'g2', title: '精读《爱的博弈》并输出读书笔记', krs: [
             { id: 'kr21', title: '精读全书', progress: 70 },
             { id: 'kr22', title: '输出读书笔记', progress: 50 }
           ] }
