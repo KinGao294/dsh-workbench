@@ -194,7 +194,7 @@ return {
       { key: '医疗', icon: '💊', color: 'amber' },
       { key: '其他', icon: '📦', color: 'gray' }
     ]
-    const goalPct = (g) => { const krs = (g && g.krs) || []; return krs.length ? Math.round(krs.reduce((s, k) => s + (k.progress || 0), 0) / krs.length) : 0 }
+    const goalPct = (g) => { if (!g) return 0; const krs = g.krs || []; if (krs.length) return Math.round(krs.reduce((s, k) => s + (k.progress || 0), 0) / krs.length); return Math.min(100, g.progress || 0) }
 
     function defaults() {
       const now = new Date()
@@ -280,7 +280,7 @@ return {
       if (!out.budget || typeof out.budget.total !== 'number') out.budget = base.budget
       if (!Array.isArray(out.goals)) out.goals = base.goals
       out.goals.forEach((g) => { if (!Array.isArray(g.krs)) g.krs = [] })
-      if (!Array.isArray(out.expenses)) out.expenses = []
+      if (!('expenses' in d) || !Array.isArray(out.expenses)) out.expenses = []
       if (out.budget && out.budget.spent > 0 && !out.expenses.length) {
         const first = dateKey(new Date(now.getFullYear(), now.getMonth(), 1))
         out.expenses.push({ id: uid(), date: first, amount: out.budget.spent, cat: '其他', note: '历史支出' })
