@@ -216,6 +216,7 @@ return {
           { id: 'b3', title: 'OpenAI 推出前沿模型零数据留存，企业客户终于能放心用 API？', tag: '选题雷达' },
           { id: 'b4', title: '为前沿模型提供零数据留存 / Zero-Data...', tag: '选题雷达' }
         ],
+        briefingsDate: '',
         budget: { total: 8000, spent: 0 },
         expenses: [
           { id: 'ex1', date: key, amount: 38, cat: '餐饮', note: '午餐外卖' },
@@ -404,7 +405,7 @@ return {
           h('div', { className: 'wb-brief-num' }, String(i + 1).padStart(2, '0')),
           h('div', { className: 'wb-brief-text' }, b.title),
           h('span', { className: 'wb-brief-tag' }, b.tag || '选题')))),
-        h('div', { style: { fontSize: 11, color: '#a099b8', marginTop: 10, textAlign: 'center' } }, '四任务重点聚合 · 每日自动更新'))
+        h('div', { style: { fontSize: 11, color: '#a099b8', marginTop: 10, textAlign: 'center' } }, 'Hacker News 热点 · 每日自动抓取'))
 
       const habits = p.data.habits || []
       const habitDoneN = habits.filter((x) => x.done).length
@@ -664,13 +665,21 @@ return {
 
     function BriefingsPage(p) {
       const [input, setInput] = React.useState('')
+      const [busy, setBusy] = React.useState(false)
       function add() {
         if (!input.trim()) return
-        p.update((d) => { d.briefings.unshift({ id: uid(), title: input.trim(), tag: '选题雷达' }) })
+        p.update((d) => { d.briefings.unshift({ id: uid(), title: input.trim(), tag: '手动收录' }) })
         setInput('')
       }
+      function refresh() {
+        setBusy(true)
+        p.refreshBriefings(() => setBusy(false))
+      }
       return h('div', { className: 'wb-page' },
-        h(PageHead, { icon: '🔥', title: '热点简报', sub: '四任务重点聚合 · 每日自动更新' },
+        h(PageHead, { icon: '🔥', title: '热点简报', sub: '自动抓取 Hacker News 热点 · 每日更新' + (p.data.briefingsDate ? ' · 更新于 ' + p.data.briefingsDate : '') },
+          h('div', { className: 'wb-panel-head', style: { marginTop: 14 } },
+            h('div', { className: 'wb-panel-title' }, '今日热点'),
+            h('button', { className: 'wb-add-btn', onClick: refresh }, busy ? '⏳ 抓取中…' : '⚡ 立即刷新')),
           h('div', { className: 'wb-list', style: { marginTop: 14 } }, (p.data.briefings || []).map((b, i) => h('div', { key: b.id, className: 'wb-brief-row' },
             h('div', { className: 'wb-brief-num' }, String(i + 1).padStart(2, '0')),
             h('div', { className: 'wb-brief-text' }, b.title),
@@ -891,6 +900,9 @@ return {
       function addYesterday() { if (!yInput.trim()) return; update((d) => { d.tasks[yesterdayKey] = (d.tasks[yesterdayKey] || []).concat({ id: uid(), text: yInput.trim(), done: false }) }); setYInput('') }
       function toggleList(key, id) { update((d) => { d[key] = (d[key] || []).map((x) => x.id === id ? Object.assign({}, x, { done: !x.done }) : x) }) }
       function delList(key, id) { update((d) => { d[key] = (d[key] || []).filter((x) => x.id !== id) }) }
+      function refreshBriefings(done) {
+        host.call('wb:briefings-refresh').then((d) => { if (done) done(normalize(d)) }).catch(() => { if (done) done() })
+      }
 
       let content
       switch (page) {
@@ -900,7 +912,7 @@ return {
         case 'budget': content = h(BudgetPage, { data, update }); break
         case 'goals': content = h(GoalsPage, { data, update }); break
         case 'tasks': content = h(TasksPage, { data, update, todayKey, yesterdayKey, todayTasks, yesterdayTasks }); break
-        case 'brief': content = h(BriefingsPage, { data, update }); break
+        case 'brief': content = h(BriefingsPage, { data, update, refreshBriefings }); break
         case 'topic': content = h(TopicsPage, { data, update }); break
         case 'books': content = h(BooksPage, { data, update }); break
         case 'review': content = h(ReviewPage, { data, update, todayKey, dateLine }); break
