@@ -2,6 +2,69 @@ return {
   apply(ctx) {
     const fs = ctx.get('fs')
     const sp = ctx.get('sandboxPolicy')
+    const web = ctx.get('web')
+    const pad = (n) => String(n).padStart(2, '0')
+    const todayKey = () => { const d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) }
+
+    async function fetchText(url) {
+      if (!web || typeof web.fetch !== 'function') return null
+      const attempts = [() => web.fetch({ url }), () => web.fetch(url)]
+      for (const attempt of attempts) {
+        try {
+          const r = await attempt()
+          if (!r) continue
+          if (typeof r === 'string') return r
+          if (typeof r.text === 'string') return r.text
+          if (typeof r.content === 'string') return r.content
+          if (typeof r.body === 'string') return r.body
+        } catch (e) {}
+      }
+      return null
+    }
+
+    const AI_WORDS = ['ai', 'openai', 'anthropic', 'claude', 'gpt', 'llm', 'model', 'agent', 'copilot', 'gemini', 'deepseek', 'mistral', 'llama', 'neural', 'robot', 'chip', 'gpu']
+    function looksAI(t) {
+      const s = String(t).toLowerCase()
+      return AI_WORDS.some((w) => s.indexOf(w) >= 0)
+    }
+
+    async function fetchHN() {
+      const idsRaw = await fetchText('https://hacker-news.firebaseio.com/v0/topstories.json')
+      if (!idsRaw) return null
+      let ids = []
+      try { ids = JSON.parse(idsRaw).slice(0, 20) } catch (e) { return null }
+      const picked = []
+      for (const id of ids) {
+        if (picked.length >= 8) break
+        const raw = await fetchText('https://hacker-news.firebaseio.com/v0/item/' + id + '.json')
+        if (!raw) continue
+        try {
+          const item = JSON.parse(raw)
+          if (item && item.title && !item.dead) picked.push(item)
+        } catch (e) {}
+      }
+      if (!picked.length) return null
+      const aiFirst = picked.filter((x) => looksAI(x.title)).concat(picked.filter((x) => !looksAI(x.title)))
+      return aiFirst.slice(0, 4).map((item) => ({
+        id: 'hn' + item.id,
+        title: String(item.title),
+        tag: looksAI(item.title) ? 'AI 热点' : '科技雷达'
+      }))
+    }
+
+    async function ensureFreshBriefings(data, force) {
+      const today = todayKey()
+      if (!force && data.briefingsDate === today && Array.isArray(data.briefings) && data.briefings.length) return data
+      try {
+        const fresh = await fetchHN()
+        if (fresh && fresh.length) {
+          data.briefings = fresh
+          data.briefingsDate = today
+          await save(data)
+        }
+      } catch (e) { console.log('[workbench] briefings refresh failed', e) }
+      return data
+    }
     let memory = null
     let target = null
     let policy = null
@@ -128,7 +191,18 @@ return {
       }
       return memory
     }
-    harness.handle('wb:load', async () => { try { return await load() } catch (e) { return defaults() } })
+    harness.handle('wb:load', async () => {
+      try {
+        const d = await load()
+        return await ensureFreshBriefings(d, false)
+      } catch (e) { return defaults() }
+    })
+    harness.handle('wb:briefings-refresh', async () => {
+      try {
+        const d = await load()
+        return await ensureFreshBriefings(d, true)
+      } catch (e) { return defaults() }
+    })
     harness.handle('wb:save', async (args) => { try { return await save(args || defaults()) } catch (e) { return { ok: false } } })
     harness.handle('wb:export', async () => { try { return await exportData() } catch (e) { return { ok: false } } })
     harness.handle('wb:reset', async () => { try { return await resetData() } catch (e) { return defaults() } })
